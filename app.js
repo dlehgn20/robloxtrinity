@@ -367,7 +367,7 @@ $("nadd").onclick = async () => {
 };
 (async () => {
     if (!sb) {
-        document.body.insertAdjacentHTML("afterbegin", '<div style="background:#B4503C;color:#fff;padding:8px 16px;font-size:13px;text-align:center">서버 설정이 아직 안 되어 있어요. index.html 맨 위의 SB_URL, SB_KEY를 입력해 주세요.</div>');
+        document.body.insertAdjacentHTML("afterbegin", '<div style="background:#B4503C;color:#fff;padding:8px 16px;font-size:13px;text-align:center">서버 설정이 아직 안 되어 있어요. config.js 의 SB_URL, SB_KEY를 확인해 주세요.</div>');
         return;
     }
     await loadAll();
@@ -562,4 +562,4 @@ function bars(t) {
         x += w;
     }
     return `<svg viewBox="0 0 ${x} 44" width="220" height="44" preserveAspectRatio="none" role="img" aria-label="바코드">${r}</svg>`;
-} 
+}

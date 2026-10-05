@@ -32,7 +32,7 @@ button {
   outline-offset: 2px;
 }
 .wrap {
-  max-width: 1040px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -59,11 +59,13 @@ button {
   box-shadow: 0 1px 0 rgba(42,38,35,.06);
 }
 .gh-in {
-  height: 64px;
+  height: 88px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: 0 clamp(16px,17%,360px);
+  padding: 0 32px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 .logo {
   justify-self: start;
@@ -74,47 +76,63 @@ button {
   padding: 0;
 }
 .logo img {
-  height: 30px;
+  height: 42px;
   width: auto;
   display: block;
 }
 nav {
   display: flex;
-  gap: 44px;
+  gap: 64px;
 }
 nav button {
   border: 0;
   background: none;
   font-weight: 700;
-  font-size: 14px;
-  padding: 8px 2px;
+  font-size: 18px;
+  padding: 10px 4px;
+  transition: color .2s, background .2s;
+  border-radius: 10px;
+}
+nav button:hover {
+  background: rgba(110,99,91,.10);
+  color: var(--brand);
 }
 .login {
   justify-self: end;
   background: var(--brand);
   color: #fff;
   border: 0;
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 12px;
+  border-radius: 12px;
+  padding: 11px 26px;
+  font-size: 15px;
+  transition: background .2s, transform .2s, box-shadow .2s;
+}
+.login:hover {
+  background: #574D46;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(42,38,35,.28);
+}
+.login:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 /* ===== 검색 바 ===== */
 .hero {
-  padding: 70px 0 6px;
+  padding: 90px 0 10px;
 }
 .hero .wrap {
-  max-width: 1180px;
+  max-width: 1320px;
 }
 .bar {
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+  box-shadow: 0 4px 18px rgba(0,0,0,.08);
   display: flex;
   align-items: center;
-  height: 62px;
-  padding: 0 10px 0 16px;
+  height: 88px;
+  padding: 0 14px 0 28px;
   position: relative;
 }
 .f {
@@ -128,23 +146,23 @@ nav button {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   position: relative;
 }
 .f small,
 .dates small {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1;
 }
 .f b {
-  font-size: 16px;
+  font-size: 21px;
   font-weight: 700;
   line-height: 1.2;
 }
 .f b i {
   font-style: normal;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--mute);
   margin-left: 4px;
   font-weight: 500;
@@ -152,7 +170,7 @@ nav button {
 .f b.g {
   color: var(--mute);
   font-weight: 400;
-  font-size: 16px;
+  font-size: 21px;
 }
 .sep:before,
 .dates:before {
@@ -179,13 +197,13 @@ nav button {
   align-items: center;
   gap: 30px;
   color: var(--mute);
-  font-size: 15px;
+  font-size: 20px;
 }
 .dt {
   border: 0;
   background: none;
   color: var(--mute);
-  font-size: 15px;
+  font-size: 20px;
   padding: 0;
 }
 .dt.has {
@@ -196,10 +214,10 @@ nav button {
   border: 0;
   background: #F1F1F1;
   color: #333;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1;
   padding: 0;
   flex: none;
@@ -207,8 +225,8 @@ nav button {
   z-index: 2;
 }
 .go {
-  width: 42px;
-  height: 42px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   border: 0;
   background: #7A6E66;
@@ -217,6 +235,10 @@ nav button {
   place-items: center;
   flex: none;
   margin-left: 6px;
+}
+.go svg {
+  width: 26px;
+  height: 26px;
 }
 
 /* ===== 출발지 · 도착지 · 탑승자 팝업 ===== */
@@ -491,7 +513,7 @@ nav button {
   border-radius: 4px;
 }
 #pt {
-  font-size: 14px;
+  font-size: 19px;
 }
 
 /* ===== 이벤트 · 공지 목록 ===== */
@@ -793,6 +815,21 @@ dialog::backdrop {
 
 /* ===== 모바일 ===== */
 @media (max-width: 720px) {
+  .logo img {
+    height: 32px;
+  }
+  nav button {
+    font-size: 15px;
+  }
+  .hero {
+    padding-top: 36px;
+  }
+  .f b,
+  .f b.g,
+  #pt,
+  .dt {
+    font-size: 16px;
+  }
   .gh-in {
     height: auto;
     min-height: 56px;
@@ -862,5 +899,11 @@ dialog::backdrop {
   .hero,
   .noprint {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
   }
 }
