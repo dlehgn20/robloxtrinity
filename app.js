@@ -1,58 +1,33 @@
 // ============ 설정 · 공통 도구 ============
 const sb = !SB_URL.startsWith("여기에") && window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
-const $ = (id) => document.getElementById(id);
-const VIEW_NAMES = ["home", "checkin", "info", "admin", "notice"];
+const $ = i => document.getElementById(i);
 
 // ============ 공항 데이터 · 상태 ============
-const REG = [
-    ["대한민국", { ICN: "서울/인천", GMP: "서울/김포", CJU: "제주", TAE: "대구", CJJ: "청주", KWJ: "광주", PUS: "부산/김해" }],
-    ["일본", { NRT: "도쿄/나리타", KIX: "오사카/간사이", FUK: "후쿠오카", CTS: "삿포로", OKA: "오키나와" }, 1],
-    ["동남아시아", { BKK: "방콕", DAD: "다낭", SGN: "호치민", MNL: "마닐라", CEB: "세부" }],
-    ["동북아시아", { TPE: "타이베이", HKG: "홍콩" }],
-    ["유럽", { CDG: "파리", LHR: "런던" }],
-    ["호주/괌", { GUM: "괌", SYD: "시드니" }],
-    ["미주", { HNL: "하와이", LAX: "로스앤젤레스" }],
-    ["몽골/중앙아시아", { ULN: "울란바토르", TAS: "타슈켄트" }],
-];
-const AP = Object.assign({}, ...REG.map((group) => group[1]));
-const FAV = new Set(["GMP", "CJU"]);
+const REG = [["대한민국", { ICN: "서울/인천", GMP: "서울/김포", CJU: "제주", TAE: "대구", CJJ: "청주", KWJ: "광주", PUS: "부산/김해" }], ["일본", { NRT: "도쿄/나리타", KIX: "오사카/간사이", FUK: "후쿠오카", CTS: "삿포로", OKA: "오키나와" }, 1], ["동남아시아", { BKK: "방콕", DAD: "다낭", SGN: "호치민", MNL: "마닐라", CEB: "세부" }], ["동북아시아", { TPE: "타이베이", HKG: "홍콩" }], ["유럽", { CDG: "파리", LHR: "런던" }], ["호주/괌", { GUM: "괌", SYD: "시드니" }], ["미주", { HNL: "하와이", LAX: "로스앤젤레스" }], ["몽골/중앙아시아", { ULN: "울란바토르", TAS: "타슈켄트" }]];
+const AP = Object.assign({}, ...REG.map(r => r[1])), FAV = new Set(["GMP", "CJU"]);
 const S = { o: null, d: null, a: 1, date: null };
 let isAdmin = false;
-const BK = {
-    TRN482: { n: "김로블", o: "GMP", d: "CJU", fl: "TR 101", date: "2026-10-12", dep: "10:40", taken: ["1A", "1B", "2C", "4E", "7B", "9A"] },
-};
-const pad = (value) => String(value).padStart(2, "0");
-const iso = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-
-function toast(message) {
-    const target = $("toast");
-    target.textContent = message;
-    target.style.display = "block";
-    clearTimeout(target._);
-    target._ = setTimeout(() => {
-        target.style.display = "none";
-    }, 2400);
+const BK = { TRN482: { n: "김로블", o: "GMP", d: "CJU", fl: "TR 101", date: "2026-10-12", dep: "10:40", taken: ["1A", "1B", "2C", "4E", "7B", "9A"] } };
+const pad = n => String(n).padStart(2, "0"), iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+function toast(m) {
+    const t = $("toast");
+    t.textContent = m;
+    t.style.display = "block";
+    clearTimeout(t._);
+    t._ = setTimeout(() => t.style.display = "none", 2400);
 }
-
-function go(viewName) {
-    const nextView = viewName === "admin" && !isAdmin ? "home" : viewName;
-
-    VIEW_NAMES.forEach((view) => $(view).classList.toggle("hid", view !== nextView));
-    document.querySelectorAll("nav button").forEach((button) => {
-        button.classList.toggle("on", button.dataset.v === nextView);
-    });
-
-    if (nextView === "checkin") {
-        ["c2", "c3"].forEach((id) => $(id).classList.add("hid"));
+function go(v) {
+    if (v == "admin" && !isAdmin)
+        v = "home";
+    ["home", "checkin", "info", "admin", "notice"].forEach(x => $(x).classList.toggle("hid", x != v));
+    document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.v == v));
+    if (v == "checkin") {
+        ["c2", "c3"].forEach(x => $(x).classList.add("hid"));
         $("c1").classList.remove("hid");
     }
-
     window.scrollTo(0, 0);
 }
-
-document.querySelectorAll("nav button").forEach((button) => {
-    button.onclick = () => go(button.dataset.v);
-});
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => go(b.dataset.v));
 
 // ============ 검색 바 (출발지 · 도착지 · 탑승자) ============
 function fill() {
