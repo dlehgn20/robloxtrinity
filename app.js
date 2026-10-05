@@ -1,33 +1,47 @@
 // ============ 설정 · 공통 도구 ============
-const sb = !SB_URL.startsWith("여기에") && window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
-const $ = i => document.getElementById(i);
+const APP_VIEWS = ["home", "checkin", "info", "admin", "notice"];
+const $ = (id) => document.getElementById(id);
+const sb = HAS_SUPABASE_CONFIG && window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
 
 // ============ 공항 데이터 · 상태 ============
 const REG = [["대한민국", { ICN: "서울/인천", GMP: "서울/김포", CJU: "제주", TAE: "대구", CJJ: "청주", KWJ: "광주", PUS: "부산/김해" }], ["일본", { NRT: "도쿄/나리타", KIX: "오사카/간사이", FUK: "후쿠오카", CTS: "삿포로", OKA: "오키나와" }, 1], ["동남아시아", { BKK: "방콕", DAD: "다낭", SGN: "호치민", MNL: "마닐라", CEB: "세부" }], ["동북아시아", { TPE: "타이베이", HKG: "홍콩" }], ["유럽", { CDG: "파리", LHR: "런던" }], ["호주/괌", { GUM: "괌", SYD: "시드니" }], ["미주", { HNL: "하와이", LAX: "로스앤젤레스" }], ["몽골/중앙아시아", { ULN: "울란바토르", TAS: "타슈켄트" }]];
-const AP = Object.assign({}, ...REG.map(r => r[1])), FAV = new Set(["GMP", "CJU"]);
-const S = { o: null, d: null, a: 1, date: null };
+const AP = Object.assign({}, ...REG.map((group) => group[1]));
+const FAV = new Set(["GMP", "CJU"]);
+const DEFAULT_STATE = { o: null, d: null, a: 1, date: null };
+const S = { ...DEFAULT_STATE };
 let isAdmin = false;
 const BK = { TRN482: { n: "김로블", o: "GMP", d: "CJU", fl: "TR 101", date: "2026-10-12", dep: "10:40", taken: ["1A", "1B", "2C", "4E", "7B", "9A"] } };
-const pad = n => String(n).padStart(2, "0"), iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
-function toast(m) {
-    const t = $("toast");
-    t.textContent = m;
-    t.style.display = "block";
-    clearTimeout(t._);
-    t._ = setTimeout(() => t.style.display = "none", 2400);
+const pad = (n) => String(n).padStart(2, "0");
+const iso = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+function toast(message) {
+    const target = $("toast");
+    target.textContent = message;
+    target.style.display = "block";
+    clearTimeout(target._);
+    target._ = setTimeout(() => {
+        target.style.display = "none";
+    }, 2400);
 }
-function go(v) {
-    if (v == "admin" && !isAdmin)
-        v = "home";
-    ["home", "checkin", "info", "admin", "notice"].forEach(x => $(x).classList.toggle("hid", x != v));
-    document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.v == v));
-    if (v == "checkin") {
-        ["c2", "c3"].forEach(x => $(x).classList.add("hid"));
+
+function go(viewName) {
+    const nextView = viewName === "admin" && !isAdmin ? "home" : viewName;
+    APP_VIEWS.forEach((viewId) => $(viewId).classList.toggle("hid", viewId !== nextView));
+    document.querySelectorAll("nav button").forEach((button) => {
+        button.classList.toggle("on", button.dataset.v === nextView);
+    });
+
+    if (nextView === "checkin") {
+        ["c2", "c3"].forEach((id) => $(id).classList.add("hid"));
         $("c1").classList.remove("hid");
     }
+
     window.scrollTo(0, 0);
 }
-document.querySelectorAll("nav button").forEach(b => b.onclick = () => go(b.dataset.v));
+
+document.querySelectorAll("nav button").forEach((button) => {
+    button.addEventListener("click", () => go(button.dataset.v));
+});
 
 // ============ 검색 바 (출발지 · 도착지 · 탑승자) ============
 function fill() {
@@ -220,7 +234,7 @@ function resetHome() {
     closePop();
     if (dlg.open)
         dlg.close();
-    Object.assign(S, { o: null, d: null, a: 1, date: null });
+    Object.assign(S, DEFAULT_STATE);
     sel = null;
     vm = new Date(today.getFullYear(), today.getMonth(), 1);
     fill();
@@ -398,10 +412,28 @@ async function isAdminRpc() {
     const { data: v, error } = await sb.rpc("is_admin");
     return !error && v === true;
 }
+function syncPublicAccess() {
+    const searchShell = $("searchShell");
+    const homeLocked = $("homeLocked");
+    const searchAllowed = isAdmin;
+
+    if (searchShell)
+        searchShell.classList.toggle("hid", !searchAllowed);
+    if (homeLocked)
+        homeLocked.classList.toggle("hid", searchAllowed);
+
+    if (!searchAllowed) {
+        $("results").innerHTML = "";
+    }
+}
+
 function setAdmin(v) {
     isAdmin = v;
-    $("adminNav").classList.toggle("hid", !v);
-    if (!v && !$("admin").classList.contains("hid"))
+    const adminNav = $("adminNav");
+    if (adminNav) adminNav.classList.toggle("hid", !v);
+    syncPublicAccess();
+    const adminPanel = $("admin");
+    if (!v && adminPanel && !adminPanel.classList.contains("hid"))
         go("home");
 }
 function renderMe() {
@@ -450,6 +482,17 @@ $("loginBtn").onclick = async () => {
     $("lerr").textContent = "";
     ldg.showModal();
 };
+const lockLoginBtn = $("lockLoginBtn");
+if (lockLoginBtn) {
+    lockLoginBtn.onclick = () => {
+        if (!sb) {
+            toast("서버 설정이 필요해요");
+            return;
+        }
+        $("lerr").textContent = "";
+        ldg.showModal();
+    };
+}
 $("ldc").onclick = async () => {
     if (!sb) {
         $("lerr").textContent = "서버에 연결되지 않았어요. config.js 설정을 확인해 주세요.";
@@ -464,6 +507,10 @@ $("ldc").onclick = async () => {
 
 // ============ 항공편 조회 ============
 function render() {
+    if (!isAdmin) {
+        toast("관리자만 항공권 조회를 사용할 수 있어요.");
+        return;
+    }
     if (!S.o || !S.d) {
         toast("출발지와 도착지를 선택해 주세요");
         return;
@@ -478,7 +525,13 @@ function render() {
     $("results").querySelectorAll("[data-f]").forEach(b => b.onclick = () => book(JSON.parse(b.dataset.f)));
     $("results").scrollIntoView({ behavior: "smooth" });
 }
-$("search").onclick = render;
+$("search").onclick = () => {
+    if (!isAdmin) {
+        toast("관리자만 항공권 조회를 사용할 수 있어요.");
+        return;
+    }
+    render();
+};
 
 // ============ 예약 ============
 let pick = null;

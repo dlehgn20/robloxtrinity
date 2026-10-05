@@ -38,6 +38,35 @@ button {
 }
 
 /* ===== 상단 글라스 헤더 ===== */
+.top-banner {
+  background: #f0e4df;
+  border-bottom: 1px solid rgba(42,38,35,.08);
+}
+.banner-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: 146px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px 24px;
+  text-align: center;
+  color: #2a2623;
+}
+.banner-text {
+  font-size: clamp(26px, 2.2vw, 38px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.4;
+}
+.banner-plane {
+  font-size: clamp(42px, 3vw, 62px);
+  line-height: 1;
+  transform: rotate(-8deg) translateY(-4px);
+  display: inline-block;
+}
+
 .glow {
   position: absolute;
   top: 0;
@@ -120,6 +149,44 @@ nav button:hover {
 }
 .hero .wrap {
   max-width: 1320px;
+}
+.home-locked {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 270px;
+}
+.lock-card {
+  width: min(760px, 100%);
+  background: rgba(255,255,255,.78);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: 0 10px 30px rgba(42,38,35,.08);
+  padding: 40px 32px;
+  text-align: center;
+}
+.lock-badge {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #efdfd8;
+  color: #5d4d47;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.lock-card h2 {
+  margin: 0 0 12px;
+  font-size: clamp(24px, 3vw, 38px);
+}
+.lock-card p {
+  margin: 0 auto 20px;
+  max-width: 560px;
+  color: var(--mute);
+  font-size: 16px;
+  line-height: 1.7;
 }
 .bar {
   background: var(--bg);
@@ -514,10 +581,58 @@ nav button:hover {
 }
 
 /* ===== 이벤트 · 공지 목록 ===== */
+.page-title {
+  margin-top: 36px;
+}
+
 h2 {
   font-size: 20px;
   margin: 30px 0 12px;
 }
+
+.helper-text,
+.section-note,
+.muted-text,
+.info-note,
+.store,
+.muted-inline {
+  color: var(--mute);
+}
+
+.helper-text {
+  font-size: 13px;
+}
+
+.section-note {
+  margin: 4px 0 0;
+}
+
+.card-title {
+  margin: 0 0 4px;
+}
+
+.section-title {
+  margin: 0 0 10px;
+}
+
+.header-count {
+  color: var(--mute);
+  font-weight: 400;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.info-note {
+  font-size: 13px;
+  margin: 12px 0 0;
+}
+
+.muted-inline {
+  font-size: 12px;
+}
+
 .promo {
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
