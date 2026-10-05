@@ -170,6 +170,7 @@ function airportPop(key, btn) {
     } else if (d.s) {
       FAV.has(d.s) ? FAV.delete(d.s) : FAV.add(d.s);
       draw();
+      if (user) saveFavoriteRoutes();
     } else if (d.k) {
       const o = key == "o" ? "d" : "o";
       if (d.k == S[o]) S[o] = S[key];
@@ -594,6 +595,32 @@ $("nok").onclick = () => {
 
 // ============ 로그인 (디스코드) ============
 let user = null;
+let favoriteSaveQueue = Promise.resolve();
+function restoreFavoriteRoutes(account) {
+  FAV.clear();
+  const routes = account?.user_metadata?.favorite_routes;
+  if (Array.isArray(routes)) {
+    routes.filter((code) => AP[code]).forEach((code) => FAV.add(code));
+  }
+}
+function saveFavoriteRoutes() {
+  if (!sb || !user) return;
+  const accountId = user.id;
+  const routes = [...FAV];
+  favoriteSaveQueue = favoriteSaveQueue
+    .then(async () => {
+      if (!user || user.id !== accountId) return;
+      const { data, error } = await sb.auth.updateUser({
+        data: { favorite_routes: routes },
+      });
+      if (error) throw error;
+      if (user?.id === accountId && data.user) user = data.user;
+    })
+    .catch((error) => {
+      console.error(error);
+      toast("즐겨찾기를 저장하지 못했어요");
+    });
+}
 async function isAdminRpc() {
   const { data: v, error } = await sb.rpc("is_admin");
   return !error && v === true;
@@ -634,6 +661,7 @@ async function refreshAuth() {
   if (!sb) return;
   const { data } = await sb.auth.getSession();
   user = data.session ? data.session.user : null;
+  restoreFavoriteRoutes(user);
   if (user && ldg.open) ldg.close();
   renderMe();
   setAdmin(user ? await isAdminRpc() : false);
