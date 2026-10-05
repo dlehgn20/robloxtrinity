@@ -49,7 +49,8 @@ const BK = {
     n: "김로블",
     o: "GMP",
     d: "CJU",
-    fl: "TR 101",
+    fl: "TW101",
+    gate: "A1",
     date: "2026-10-12",
     dep: "10:40",
     taken: ["1A", "1B", "2C", "4E", "7B", "9A"],
@@ -360,6 +361,11 @@ const nf = {
     arr: TM.test(d.arr) ? d.arr : "00:00",
     dur: +d.dur || 0,
     date: DT.test(d.date) ? d.date : "",
+    gate: String(d.gate || "")
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9-]/g, "")
+      .slice(0, 6),
   }),
   notices: (id, d) => ({
     id: /^[\w-]+$/.test(id) ? id : "",
@@ -388,6 +394,7 @@ const toRow = {
     arr: f.arr,
     dur: f.dur,
     date: f.date,
+    gate: f.gate,
   }),
   notices: (n) => ({
     id: n.id,
@@ -438,10 +445,10 @@ function renderAll() {
   );
   $("fcount").textContent = `(${F.length}편)`;
   $("ftb").innerHTML = F.length
-    ? "<tr><th>운항 날짜</th><th>편명</th><th>구간</th><th>시간</th><th></th></tr>" +
+    ? "<tr><th>운항 날짜</th><th>편명</th><th>구간</th><th>시간</th><th>게이트</th><th></th></tr>" +
       F.map(
         (f) =>
-          `<tr><td>${f.date}</td><td><b>${esc(f.no)}</b></td><td>${f.o} → ${f.d}<br><small>${AP[f.o]} → ${AP[f.d]}</small></td><td>${f.dep} → ${f.arr}${f.arr < f.dep ? " (+1일)" : ""}</td><td>${delBtn("flights", f.id)}</td></tr>`,
+          `<tr><td>${f.date}</td><td><b>${esc(f.no)}</b></td><td>${f.o} → ${f.d}<br><small>${AP[f.o]} → ${AP[f.d]}</small></td><td>${f.dep} → ${f.arr}${f.arr < f.dep ? " (+1일)" : ""}</td><td>${esc(f.gate || "미정")}</td><td>${delBtn("flights", f.id)}</td></tr>`,
       ).join("")
     : '<tr><td style="color:var(--mute)">등록된 항공편이 없어요.</td></tr>';
   const N = [...data.notices].sort((x, y) =>
@@ -507,12 +514,15 @@ $("fadd").onclick = async () => {
     d = $("fd2").value,
     t1 = $("ft1").value,
     t2 = $("ft2").value,
+    gate = $("fgate").value.trim().toUpperCase(),
     date = $("ff").value,
     e = (m) => {
       $("ferr").textContent = m;
     };
-  if (!/^[A-Z0-9 ]{2,8}$/.test(no))
-    return e("편명은 영문·숫자 2~8자로 입력해 주세요. (예: TR 301)");
+  if (!/^TW\d{3}$/.test(no))
+    return e("편명은 TW와 숫자 3자리로 입력해 주세요. (예: TW123)");
+  if (!/^[A-Z0-9-]{1,6}$/.test(gate))
+    return e("게이트를 영문·숫자 1~6자로 입력해 주세요. (예: A1)");
   if (!o || !d) return e("출발지와 도착지를 선택해 주세요.");
   if (o == d) return e("출발지와 도착지가 같아요.");
   if (!date || date < iso(today)) return e("운항 날짜를 확인해 주세요.");
@@ -529,14 +539,20 @@ $("fadd").onclick = async () => {
     dep: t1,
     arr: t2,
     dur: (mins(t2) - mins(t1) + 1440) % 1440,
+    gate,
   };
   try {
     await save("flights", fl);
     toast(`항공편 ${no} 등록 완료`);
-    ["fn", "ft1", "ft2"].forEach((i) => ($(i).value = ""));
+    ["fn", "ft1", "ft2", "fgate"].forEach((i) => ($(i).value = ""));
     $("fo2").value = $("fd2").value = "";
   } catch (x) {
-    e("저장에 실패했어요: " + (x.message || x.code));
+    const message = String(x.message || x.code || "");
+    if (/gate.*column|column.*gate/i.test(message))
+      return e(
+        "Supabase flights 표에 gate 컬럼이 없어요. add-flight-gate.sql 내용을 먼저 실행해 주세요.",
+      );
+    e("저장에 실패했어요: " + message);
   }
 };
 $("nadd").onclick = async () => {
@@ -721,7 +737,7 @@ function render() {
       ? list
           .map(
             (f) =>
-              `<div class="flt"><div class="t">${f.dep}</div><div style="color:var(--mute)">${esc(f.no)} · ${f.dur}분 소요 → 도착 ${f.arr}${f.arr < f.dep ? " (+1일)" : ""}</div><button class="btn" data-f='${JSON.stringify({ fl: f.no, o: f.o, d: f.d, date: d1, dep: f.dep, arr: f.arr })}'>선택</button></div>`,
+              `<div class="flt"><div class="t">${f.dep}</div><div style="color:var(--mute)">${esc(f.no)} · ${f.dur}분 소요 → 도착 ${f.arr}${f.arr < f.dep ? " (+1일)" : ""} · 게이트 ${esc(f.gate || "미정")}</div><button class="btn" data-f='${JSON.stringify({ fl: f.no, o: f.o, d: f.d, date: d1, dep: f.dep, arr: f.arr, gate: f.gate })}'>선택</button></div>`,
           )
           .join("")
       : '<p style="color:var(--mute);padding:18px 4px">이 날짜에 운항하는 항공편이 없어요. 다른 날짜를 선택해 보세요.</p>');
@@ -761,6 +777,7 @@ $("book").onclick = () => {
     fl: pick.fl,
     date: pick.date,
     dep: pick.dep,
+    gate: pick.gate,
     taken: ["1A", "2B", "3C", "5D", "8F"],
   };
   $("book").style.display = "none";
@@ -839,7 +856,7 @@ $("confirm").onclick = () => {
       return pad(Math.floor(t / 60)) + ":" + pad(t % 60);
     })();
   $("pass").innerHTML =
-    `<div class="top"><b>TRINITY AIRLINES 탑승권</b><span>✔ 체크인 완료</span></div><div class="body"><div><small>탑승객</small><strong>${b.n}</strong></div><div><small>출발</small><strong>${b.o}</strong><small>${AP[b.o]}</small></div><div><small>도착</small><strong>${b.d}</strong><small>${AP[b.d]}</small></div><div><small>편명</small><strong>${b.fl}</strong></div><div><small>날짜</small><strong>${b.date}</strong></div><div><small>탑승 시작</small><strong>${bt}</strong></div><div><small>게이트</small><strong>${"ABC"[hash(b.c) % 3]}${1 + (hash(b.c) % 9)}</strong></div><div><small>좌석</small><strong>${seat}</strong></div></div><div class="bar2">${bars(b.c + seat)}<small>출발 40분 전 탑승 마감 · 예약번호 ${b.c}</small></div>`;
+    `<div class="top"><b>TRINITY AIRLINES 탑승권</b><span>✔ 체크인 완료</span></div><div class="body"><div><small>탑승객</small><strong>${b.n}</strong></div><div><small>출발</small><strong>${b.o}</strong><small>${AP[b.o]}</small></div><div><small>도착</small><strong>${b.d}</strong><small>${AP[b.d]}</small></div><div><small>편명</small><strong>${b.fl}</strong></div><div><small>날짜</small><strong>${b.date}</strong></div><div><small>탑승 시작</small><strong>${bt}</strong></div><div><small>게이트</small><strong>${esc(b.gate || "미정")}</strong></div><div><small>좌석</small><strong>${seat}</strong></div></div><div class="bar2">${bars(b.c + seat)}<small>출발 40분 전 탑승 마감 · 예약번호 ${b.c}</small></div>`;
   b.taken.push(seat);
   BK[b.c].taken = b.taken;
   $("c2").classList.add("hid");
