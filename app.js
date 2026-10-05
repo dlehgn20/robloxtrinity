@@ -423,6 +423,11 @@ function renderMe() {
     sp.textContent = name;
     me.append(sp);
 }
+function getOAuthRedirect() {
+    if (location.protocol === "file:")
+        return null;
+    return location.href.split(/[?#]/)[0].replace(/index\.html$/, "");
+}
 async function refreshAuth() {
     if (!sb)
         return;
@@ -455,9 +460,13 @@ $("ldc").onclick = async () => {
         $("lerr").textContent = "서버에 연결되지 않았어요. config.js 설정을 확인해 주세요.";
         return;
     }
+    if (location.protocol === "file:") {
+        $("lerr").textContent = "로컬 파일 경로에서는 Discord 로그인이 불가해요. VS Code Live Server 또는 http://localhost:8000 으로 실행해 주세요.";
+        return;
+    }
     $("lerr").textContent = "";
-    const back = location.href.split(/[?#]/)[0].replace(/index\.html$/, "");
-    const { error } = await sb.auth.signInWithOAuth({ provider: "discord", options: { redirectTo: back } });
+    const back = getOAuthRedirect();
+    const { error } = await sb.auth.signInWithOAuth({ provider: "discord", options: { redirectTo: back || window.location.origin } });
     if (error)
         $("lerr").textContent = "디스코드 로그인 실패: " + error.message;
 };
