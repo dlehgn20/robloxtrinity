@@ -16,6 +16,10 @@
 }
 body {
   margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   color: var(--ink);
   font:
@@ -578,10 +582,46 @@ textarea.in {
 }
 footer {
   background: var(--soft);
-  margin-top: 50px;
-  padding: 28px 0;
+  flex-shrink: 0;
+  min-height: 156px;
+  display: flex;
+  align-items: center;
+  padding: 34px 0;
   color: var(--mute);
   font-size: 13px;
+}
+.footer-inner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+.footer-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.footer-copy strong {
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 14px;
+}
+.footer-links {
+  display: flex;
+  gap: 28px;
+  flex: none;
+}
+.footer-links a {
+  color: var(--brand);
+  font-weight: 700;
+  text-decoration: none;
+}
+.footer-links a:hover {
+  text-decoration: underline;
+}
+main:not(.hid) {
+  flex: 1;
 }
 
 /* ===== 항공편 조회 결과 ===== */
@@ -834,6 +874,18 @@ dialog::backdrop {
 
 /* ===== 모바일 ===== */
 @media (max-width: 720px) {
+  footer {
+    min-height: 0;
+    padding: 28px 0;
+  }
+  .footer-inner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .footer-links {
+    gap: 22px;
+  }
   .logo img {
     height: 32px;
   }
