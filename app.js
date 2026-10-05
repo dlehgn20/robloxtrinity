@@ -371,7 +371,8 @@ $("nadd").onclick = async () => {
         return;
     }
     await loadAll();
-    setAdmin(await checkAdmin());
+    await refreshAuth();
+    sb.auth.onAuthStateChange(() => setTimeout(refreshAuth, 0));
 })();
 renderAll();
 $("nlist").onclick = e => {
@@ -391,24 +392,52 @@ $("nok").onclick = () => {
     $("nlist").scrollIntoView();
 };
 
-// ============ 관리자 로그인 ============
-async function checkAdmin() {
-    if (!sb)
-        return false;
-    const { data: s } = await sb.auth.getSession();
-    if (!s.session)
-        return false;
+// ============ 로그인 (디스코드) ============
+let user = null;
+async function isAdminRpc() {
     const { data: v, error } = await sb.rpc("is_admin");
     return !error && v === true;
 }
 function setAdmin(v) {
     isAdmin = v;
     $("adminNav").classList.toggle("hid", !v);
-    $("loginBtn").textContent = v ? "로그아웃" : "로그인";
+    if (!v && !$("admin").classList.contains("hid"))
+        go("home");
+}
+function renderMe() {
+    const me = $("me");
+    me.textContent = "";
+    $("loginBtn").textContent = user ? "로그아웃" : "로그인";
+    me.classList.toggle("hid", !user);
+    if (!user)
+        return;
+    const md = user.user_metadata || {};
+    const name = (md.custom_claims && md.custom_claims.global_name) || md.full_name || md.name || user.email || "사용자";
+    if (/^https:\/\//.test(md.avatar_url || "")) {
+        const img = document.createElement("img");
+        img.src = md.avatar_url;
+        img.alt = "";
+        me.append(img);
+    }
+    const sp = document.createElement("span");
+    sp.textContent = name;
+    me.append(sp);
+}
+async function refreshAuth() {
+    if (!sb)
+        return;
+    const { data } = await sb.auth.getSession();
+    user = data.session ? data.session.user : null;
+    if (user && ldg.open)
+        ldg.close();
+    renderMe();
+    setAdmin(user ? await isAdminRpc() : false);
 }
 $("loginBtn").onclick = async () => {
-    if (isAdmin) {
+    if (user) {
         await sb.auth.signOut();
+        user = null;
+        renderMe();
         setAdmin(false);
         go("home");
         toast("로그아웃 되었어요");
@@ -418,35 +447,20 @@ $("loginBtn").onclick = async () => {
         toast("서버 설정이 필요해요");
         return;
     }
-    $("lid").value = $("lpw").value = "";
     $("lerr").textContent = "";
     ldg.showModal();
-    $("lid").focus();
 };
-async function doLogin() {
-    if (!sb)
-        return;
-    const { error } = await sb.auth.signInWithPassword({ email: $("lid").value.trim(), password: $("lpw").value });
-    if (error) {
-        $("lerr").textContent = "이메일 또는 비밀번호가 올바르지 않아요.";
+$("ldc").onclick = async () => {
+    if (!sb) {
+        $("lerr").textContent = "서버에 연결되지 않았어요. config.js 설정을 확인해 주세요.";
         return;
     }
-    if (await checkAdmin()) {
-        ldg.close();
-        setAdmin(true);
-        go("admin");
-        toast("관리자로 로그인했어요");
-    }
-    else {
-        await sb.auth.signOut();
-        $("lerr").textContent = "관리자 권한이 없는 계정이에요.";
-    }
-}
-$("ldo").onclick = doLogin;
-["lid", "lpw"].forEach(i => $(i).addEventListener("keydown", e => {
-    if (e.key == "Enter")
-        doLogin();
-}));
+    $("lerr").textContent = "";
+    const back = location.href.split(/[?#]/)[0].replace(/index\.html$/, "");
+    const { error } = await sb.auth.signInWithOAuth({ provider: "discord", options: { redirectTo: back } });
+    if (error)
+        $("lerr").textContent = "디스코드 로그인 실패: " + error.message;
+};
 
 // ============ 항공편 조회 ============
 function render() {
