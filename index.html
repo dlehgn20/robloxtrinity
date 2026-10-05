@@ -1,128 +1,298 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <title>로블록스 트리니티 항공</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-<div class="glow"></div>
-<header class="gh">
-  <div class="gh-in">
-    <button class="logo" onclick="resetHome()" aria-label="트리니티항공 홈"><img src="logo.png" alt="TRINITY"></button>
-    <nav>
-      <button data-v="home" class="on">항공권 예매</button>
-      <button data-v="checkin">여행 준비</button>
-      <button data-v="info">마일리지</button>
-      <button data-v="admin" id="adminNav" class="hid">항공사 관리</button>
-    </nav>
-    <div class="gh-right">
-      <span class="me hid" id="me"></span>
-      <button class="login" id="loginBtn">로그인</button>
-    </div>
-  </div>
-</header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>로블록스 트리니티 항공</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <div class="glow"></div>
+    <header class="gh">
+      <div class="gh-in">
+        <button class="logo" onclick="resetHome()" aria-label="트리니티항공 홈">
+          <img src="logo.png" alt="TRINITY" />
+        </button>
+        <nav>
+          <button data-v="home" class="on">항공권 예매</button>
+          <button data-v="checkin">여행 준비</button>
+          <button data-v="info">마일리지</button>
+          <button data-v="admin" id="adminNav" class="hid">항공사 관리</button>
+        </nav>
+        <div class="gh-right">
+          <span class="me hid" id="me"></span>
+          <button class="login" id="loginBtn">로그인</button>
+        </div>
+      </div>
+    </header>
 
-<main id="home">
- <div class="hero"><div class="wrap">
-  <div class="bar" id="bar">
-   <button class="f" id="fo"><small>출발지</small><b></b></button>
-   <button class="swap" id="swap" aria-label="출발지와 도착지 바꾸기">⇆</button>
-   <button class="f" id="fd"><small>도착지</small><b></b></button>
-   <div class="dates"><small>출발일</small><div><button class="dt" id="b1">가는 날</button></div></div>
-   <button class="f sep" id="fp"><small>탑승객</small><b id="pt"></b></button>
-   <button class="go" id="search" aria-label="항공권 조회"><svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="9.5" cy="9.5" r="6.5"/><path d="M14.5 14.5L20 20"/></svg></button>
-  </div>
- </div></div>
- <div class="wrap">
-  <div id="results"></div>
-  <h2>지금 진행 중인 이벤트</h2>
-  <div class="promo"><div style="background:#B9826F"><b>가을 여행 특가</b>국내선 최대 20% 할인</div><div style="background:#6E635B"><b>출발 임박 특가</b>2주 이내 출발 최대 40%</div><div style="background:#4C8FBF"><b>신규 가입 쿠폰팩</b>가입하면 로벅스 쿠폰 증정</div></div>
-  <h2>공지사항</h2>
-  <ul class="notice" id="nlist"></ul>
- </div>
-</main>
+    <main id="home">
+      <div class="hero">
+        <div class="wrap">
+          <div class="bar" id="bar">
+            <button class="f" id="fo"><small>출발지</small><b></b></button>
+            <button class="swap" id="swap" aria-label="출발지와 도착지 바꾸기">
+              ⇆
+            </button>
+            <button class="f" id="fd"><small>도착지</small><b></b></button>
+            <div class="dates">
+              <small>출발일</small>
+              <div><button class="dt" id="b1">가는 날</button></div>
+            </div>
+            <button class="f sep" id="fp">
+              <small>탑승객</small><b id="pt"></b>
+            </button>
+            <button class="go" id="search" aria-label="항공권 조회">
+              <svg
+                width="22"
+                height="22"
+                fill="none"
+                stroke="#fff"
+                stroke-width="2.2"
+                stroke-linecap="round"
+              >
+                <circle cx="9.5" cy="9.5" r="6.5" />
+                <path d="M14.5 14.5L20 20" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="wrap">
+        <div id="results"></div>
+        <h2>지금 진행 중인 이벤트</h2>
+        <div class="promo">
+          <div style="background: #b9826f">
+            <b>가을 여행 특가</b>국내선 최대 20% 할인
+          </div>
+          <div style="background: #6e635b">
+            <b>출발 임박 특가</b>2주 이내 출발 최대 40%
+          </div>
+          <div style="background: #4c8fbf">
+            <b>신규 가입 쿠폰팩</b>가입하면 로벅스 쿠폰 증정
+          </div>
+        </div>
+        <h2>공지사항</h2>
+        <ul class="notice" id="nlist"></ul>
+      </div>
+    </main>
 
-<main id="checkin" class="hid"><div class="wrap">
- <h2 style="margin-top:36px">여행 준비 · 온라인체크인</h2>
- <div class="card" id="c1">
-  <label for="code">예약번호</label><input class="in" id="code" maxlength="6" placeholder="예: TRN482">
-  <label for="name">탑승객 성</label><input class="in" id="name" placeholder="예: 김">
-  <div class="err" id="err"></div><button class="btn" id="find">예약 조회</button>
-  <p style="color:var(--mute);font-size:13px">체험용: TRN482 / 김 · 항공권을 직접 예매해도 예약번호가 발급돼요.</p>
- </div>
- <div class="card hid" id="c2">
-  <b id="cinfo"></b>
-  <p style="color:var(--mute);margin:4px 0 0">앞좌석(1~3열)은 +5,000 로벅스. 좌석을 선택하세요.</p>
-  <div class="map" id="map"></div>
-  <button class="btn" id="confirm" disabled>체크인 완료</button> <button class="btn g" onclick="go('checkin')">처음으로</button>
- </div>
- <div class="hid" id="c3"><div class="pass" id="pass"></div><p class="noprint"><button class="btn" onclick="print()">탑승권 인쇄</button> <button class="btn g" onclick="go('checkin')">다른 예약</button></p></div>
-</div></main>
+    <main id="checkin" class="hid">
+      <div class="wrap">
+        <h2 style="margin-top: 36px">여행 준비 · 온라인체크인</h2>
+        <div class="card" id="c1">
+          <label for="code">예약번호</label
+          ><input class="in" id="code" maxlength="6" placeholder="예: TRN482" />
+          <label for="name">탑승객 성</label
+          ><input class="in" id="name" placeholder="예: 김" />
+          <div class="err" id="err"></div>
+          <button class="btn" id="find">예약 조회</button>
+          <p style="color: var(--mute); font-size: 13px">
+            체험용: TRN482 / 김 · 항공권을 직접 예매해도 예약번호가 발급돼요.
+          </p>
+        </div>
+        <div class="card hid" id="c2">
+          <b id="cinfo"></b>
+          <p style="color: var(--mute); margin: 4px 0 0">
+            앞좌석(1~3열)은 +5,000 로벅스. 좌석을 선택하세요.
+          </p>
+          <div class="map" id="map"></div>
+          <button class="btn" id="confirm" disabled>체크인 완료</button>
+          <button class="btn g" onclick="go('checkin')">처음으로</button>
+        </div>
+        <div class="hid" id="c3">
+          <div class="pass" id="pass"></div>
+          <p class="noprint">
+            <button class="btn" onclick="print()">탑승권 인쇄</button>
+            <button class="btn g" onclick="go('checkin')">다른 예약</button>
+          </p>
+        </div>
+      </div>
+    </main>
 
-<main id="info" class="hid"><div class="wrap"><h2 style="margin-top:36px">마일리지</h2><p style="color:var(--mute)">이 페이지는 준비 중이에요. 다음 단계에서 만들어 드릴게요.</p></div></main>
+    <main id="info" class="hid">
+      <div class="wrap">
+        <h2 style="margin-top: 36px">마일리지</h2>
+        <p style="color: var(--mute)">
+          이 페이지는 준비 중이에요. 다음 단계에서 만들어 드릴게요.
+        </p>
+      </div>
+    </main>
 
-<main id="admin" class="hid"><div class="wrap">
- <h2 style="margin-top:36px">항공사 관리</h2>
- <div class="tabs2"><button class="on" data-t="f">항공편 관리</button><button data-t="n">공지 작성</button><button disabled>이벤트 (준비 중)</button></div>
- <div id="ap-f">
-  <div class="card"><h3 style="margin:0 0 4px">항공편 등록</h3>
-   <div class="fg">
-    <div><label for="fn">편명</label><input class="in" id="fn" placeholder="예: TR 301" maxlength="8"></div>
-    <div><label for="fo2">출발지</label><select class="in" id="fo2"></select></div>
-    <div><label for="fd2">도착지</label><select class="in" id="fd2"></select></div>
-    <div><label for="ff">운항 날짜</label><input class="in" type="date" id="ff"></div>
-    <div><label for="ft1">출발 시간</label><input class="in" type="time" id="ft1"></div>
-    <div><label for="ft2">도착 시간</label><input class="in" type="time" id="ft2"></div>
-   </div>
-   <div class="err" id="ferr" role="alert"></div>
-   <button class="btn" id="fadd">항공편 등록</button>
-  </div>
-  <div class="card"><h3 style="margin:0 0 10px">등록된 항공편 <span id="fcount" style="color:var(--mute);font-weight:400"></span></h3>
-   <div style="overflow-x:auto"><table class="tb" id="ftb"></table></div><p class="store" style="color:var(--mute);font-size:13px;margin:12px 0 0"></p></div>
- </div>
- <div id="ap-n" class="hid">
-  <div class="card"><h3 style="margin:0 0 4px">공지 작성</h3>
-   <label for="nt">제목</label><input class="in" id="nt" maxlength="80" placeholder="공지 제목">
-   <label for="nb">내용 <small style="color:var(--mute)">(**글자**로 감싸면 빨간 굵은 글씨)</small></label><textarea class="in" id="nb" maxlength="3000" placeholder="공지 내용을 입력하세요"></textarea>
-   <div class="err" id="nerr" role="alert"></div>
-   <button class="btn" id="nadd">공지 등록</button>
-  </div>
-  <div class="card"><h3 style="margin:0 0 10px">등록된 공지 <span id="ncount" style="color:var(--mute);font-weight:400"></span></h3>
-   <div style="overflow-x:auto"><table class="tb" id="ntb"></table></div><p class="store" style="color:var(--mute);font-size:13px;margin:12px 0 0"></p></div>
- </div>
-</div></main>
+    <main id="admin" class="hid">
+      <div class="wrap">
+        <h2 style="margin-top: 36px">항공사 관리</h2>
+        <div class="tabs2">
+          <button class="on" data-t="f">항공편 관리</button
+          ><button data-t="n">공지 작성</button
+          ><button disabled>이벤트 (준비 중)</button>
+        </div>
+        <div id="ap-f">
+          <div class="card">
+            <h3 style="margin: 0 0 4px">항공편 등록</h3>
+            <div class="fg">
+              <div>
+                <label for="fn">편명</label
+                ><input
+                  class="in"
+                  id="fn"
+                  placeholder="예: TR 301"
+                  maxlength="8"
+                />
+              </div>
+              <div>
+                <label for="fo2">출발지</label
+                ><select class="in" id="fo2"></select>
+              </div>
+              <div>
+                <label for="fd2">도착지</label
+                ><select class="in" id="fd2"></select>
+              </div>
+              <div>
+                <label for="ff">운항 날짜</label
+                ><input class="in" type="date" id="ff" />
+              </div>
+              <div>
+                <label for="ft1">출발 시간</label
+                ><input class="in" type="time" id="ft1" />
+              </div>
+              <div>
+                <label for="ft2">도착 시간</label
+                ><input class="in" type="time" id="ft2" />
+              </div>
+            </div>
+            <div class="err" id="ferr" role="alert"></div>
+            <button class="btn" id="fadd">항공편 등록</button>
+          </div>
+          <div class="card">
+            <h3 style="margin: 0 0 10px">
+              등록된 항공편
+              <span
+                id="fcount"
+                style="color: var(--mute); font-weight: 400"
+              ></span>
+            </h3>
+            <div style="overflow-x: auto">
+              <table class="tb" id="ftb"></table>
+            </div>
+            <p
+              class="store"
+              style="color: var(--mute); font-size: 13px; margin: 12px 0 0"
+            ></p>
+          </div>
+        </div>
+        <div id="ap-n" class="hid">
+          <div class="card">
+            <h3 style="margin: 0 0 4px">공지 작성</h3>
+            <label for="nt">제목</label
+            ><input class="in" id="nt" maxlength="80" placeholder="공지 제목" />
+            <label for="nb"
+              >내용
+              <small style="color: var(--mute)"
+                >(**글자**로 감싸면 빨간 굵은 글씨)</small
+              ></label
+            ><textarea
+              class="in"
+              id="nb"
+              maxlength="3000"
+              placeholder="공지 내용을 입력하세요"
+            ></textarea>
+            <div class="err" id="nerr" role="alert"></div>
+            <button class="btn" id="nadd">공지 등록</button>
+          </div>
+          <div class="card">
+            <h3 style="margin: 0 0 10px">
+              등록된 공지
+              <span
+                id="ncount"
+                style="color: var(--mute); font-weight: 400"
+              ></span>
+            </h3>
+            <div style="overflow-x: auto">
+              <table class="tb" id="ntb"></table>
+            </div>
+            <p
+              class="store"
+              style="color: var(--mute); font-size: 13px; margin: 12px 0 0"
+            ></p>
+          </div>
+        </div>
+      </div>
+    </main>
 
-<main id="notice" class="hid"><div class="wrap" style="max-width:1000px">
- <h1 class="nh">공지사항</h1>
- <div class="nbox"><h2 id="nvt"></h2><div id="nvd"></div></div>
- <div id="nvb"></div>
- <p style="text-align:center"><button class="btn" id="nok">확인</button></p>
-</div></main>
+    <main id="notice" class="hid">
+      <div class="wrap" style="max-width: 1000px">
+        <h1 class="nh">공지사항</h1>
+        <div class="nbox">
+          <h2 id="nvt"></h2>
+          <div id="nvd"></div>
+        </div>
+        <div id="nvb"></div>
+        <p style="text-align: center">
+          <button class="btn" id="nok">확인</button>
+        </p>
+      </div>
+    </main>
 
-<footer><div class="wrap">Copyright © Roblox Trinity Airways. All rights reserved.<br>이 사이트는 로블록스 게임 속 가상 항공사를 트리니티 항공의 사이트입니다.</div></footer>
+    <footer>
+      <div class="wrap">
+        Copyright © Roblox Trinity Airways. All rights reserved.<br />이
+        사이트는 로블록스 게임 속 가상 항공사를 트리니티 항공의 사이트입니다.
+      </div>
+    </footer>
 
-<dialog id="dlg"><h3 style="margin:0 0 4px">예약하기</h3><div id="dsum" style="color:var(--mute);font-size:14px"></div>
- <label for="pn">탑승객 성명</label><input class="in" id="pn" placeholder="예: 김로블">
- <div class="err" id="perr"></div>
- <p style="margin-top:12px"><button class="btn" id="book">예약 확정</button> <button class="btn g" onclick="dlg.close()">닫기</button></p>
- <div id="done" class="hid"></div></dialog>
-<dialog id="ldg" class="lg">
-  <h3>로그인</h3>
-  <hr>
-  <button class="lg-dc" id="ldc"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/></svg>디스코드로 계속</button>
-  <button class="lg-close" onclick="ldg.close()">닫기</button>
-  <div class="err" id="lerr" role="alert"></div>
-  <hr>
-  <p class="lg-note">디스코드 계정으로 로그인하여 예약을 진행해보세요</p>
-</dialog>
-<div id="toast" style="position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#2A2623;color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;display:none;z-index:99"></div>
+    <dialog id="dlg">
+      <h3 style="margin: 0 0 4px">예약하기</h3>
+      <div id="dsum" style="color: var(--mute); font-size: 14px"></div>
+      <label for="pn">탑승객 성명</label
+      ><input class="in" id="pn" placeholder="예: 김로블" />
+      <div class="err" id="perr"></div>
+      <p style="margin-top: 12px">
+        <button class="btn" id="book">예약 확정</button>
+        <button class="btn g" onclick="dlg.close()">닫기</button>
+      </p>
+      <div id="done" class="hid"></div>
+    </dialog>
+    <dialog id="ldg" class="lg">
+      <h3>로그인</h3>
+      <hr />
+      <button class="lg-dc" id="ldc">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"
+          /></svg
+        >디스코드로 계속
+      </button>
+      <button class="lg-close" onclick="ldg.close()">닫기</button>
+      <div class="err" id="lerr" role="alert"></div>
+      <hr />
+      <p class="lg-note">디스코드 계정으로 로그인하여 예약을 진행해보세요</p>
+    </dialog>
+    <div
+      id="toast"
+      style="
+        position: fixed;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        background: #2a2623;
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 999px;
+        font-size: 14px;
+        display: none;
+        z-index: 99;
+      "
+    ></div>
 
-<script src="config.js"></script>
-<script src="app.js"></script>
-</body>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
 </html>
