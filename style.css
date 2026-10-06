@@ -1073,3 +1073,11 @@ dialog.lg h3 {
   margin: 0;
   font-size: 15px;
 }
+
+/* ===== 오픈 전: 일반 방문자에게 막힌 메뉴 표시 ===== */
+.locked .bar,
+.locked nav button[data-v="checkin"],
+.locked nav button[data-v="info"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

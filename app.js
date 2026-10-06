@@ -44,6 +44,18 @@ const AP = Object.assign({}, ...REG.map((r) => r[1])),
   FAV = new Set();
 const S = { o: null, d: null, a: 1, date: null };
 let isAdmin = false;
+
+// ---- 사이트 잠금 (config.js 의 SITE_OPEN) ----
+// 잠겨 있는 동안 일반 방문자는 공지사항 보기와 로그인만 할 수 있다.
+const canUse = () => SITE_OPEN || isAdmin;
+document.body.classList.toggle("locked", !SITE_OPEN);
+function blocked() {
+  if (canUse()) return false;
+  closePop();
+  toast("아직 오픈 전이에요. 지금은 공지사항과 로그인만 이용할 수 있어요.");
+  return true;
+}
+
 const BK = {
   TRN482: {
     n: "김로블",
@@ -71,6 +83,7 @@ function toast(m) {
   t._ = setTimeout(() => (t.style.display = "none"), 2400);
 }
 function go(v) {
+  if ((v == "checkin" || v == "info") && blocked()) return;
   if (v == "admin" && !isAdmin) v = "home";
   ["home", "checkin", "info", "admin", "notice"].forEach((x) =>
     $(x).classList.toggle("hid", x != v),
@@ -231,6 +244,14 @@ $("swap").onclick = () => {
   [S.o, S.d] = [S.d, S.o];
   fill();
 };
+// 잠겨 있으면 검색 바의 모든 클릭을 막고 안내만 보여준다
+$("bar").addEventListener(
+  "click",
+  (e) => {
+    if (blocked()) e.stopPropagation();
+  },
+  true,
+);
 document.addEventListener("click", closePop);
 document.addEventListener("keydown", (e) => {
   if (e.key == "Escape") closePop();
@@ -643,8 +664,13 @@ async function isAdminRpc() {
 }
 function setAdmin(v) {
   isAdmin = v;
+  document.body.classList.toggle("locked", !SITE_OPEN && !v);
   $("adminNav").classList.toggle("hid", !v);
-  if (!v && !$("admin").classList.contains("hid")) go("home");
+  // 관리자 권한이 사라졌을 때(로그아웃 등) 막힌 화면에 남아 있지 않게 홈으로 보낸다
+  const view = ["admin", "checkin", "info"].find(
+    (x) => !$(x).classList.contains("hid"),
+  );
+  if (!v && (view == "admin" || (view && !SITE_OPEN))) go("home");
 }
 function renderMe() {
   const me = $("me");
@@ -721,6 +747,7 @@ $("ldc").onclick = async () => {
 
 // ============ 항공편 조회 ============
 function render() {
+  if (blocked()) return;
   if (!S.o || !S.d) {
     toast("출발지와 도착지를 선택해 주세요");
     return;
